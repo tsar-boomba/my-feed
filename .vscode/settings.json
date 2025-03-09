@@ -1,0 +1,13 @@
+{
+	"prettier.configPath": "web/.prettierrc",
+	"prettier.prettierPath": "web/node_modules/prettier",
+	"sqltools.useNodeRuntime": true,
+	"sqltools.connections": [
+		{
+			"previewLimit": 50,
+			"driver": "SQLite",
+			"name": "my-feed",
+			"database": "${workspaceFolder:my-feed}/my-feed-data/db"
+		}
+	]
+}

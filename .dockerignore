@@ -1,0 +1,11 @@
+web/node_modules/
+web/dist/
+web/.gitignore
+web/.prettierrc
+
+target/
+my-feed-data/
+.vscode
+.gitignore
+.env
+push

@@ -1,0 +1,17 @@
+services:
+  my-feed:
+    platform: linux/arm64
+    container_name: my-feed
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./test-data:/my-feed-data
+    ports:
+      - 80:80
+    expose:
+      - 80
+    environment:
+      - PASSWORD=password
+      - DOMAIN=http://localhost
