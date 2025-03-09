@@ -13,10 +13,11 @@ import {
 import { useLocalStorage, useViewportSize } from '@mantine/hooks';
 import { MOBILE_WIDTH } from '../components/Layout';
 import { Item } from '../components/Item';
-import { Masonry } from 'masonic';
 import { useEffect, useRef } from 'react';
 import { TABS_HEIGHT } from '../components/Layout/MobileLayout';
 import { useTags } from '../utils/tags';
+import { useAuth } from '../utils/useAuth';
+import { Masonry } from '../components/Masonry';
 
 const DEFAULT_FROM_LAST = '1w';
 const FROM_LAST_OPTIONS: ComboboxData = [
@@ -43,10 +44,15 @@ export const Home = () => {
 		key: 'fromLast',
 		defaultValue: DEFAULT_FROM_LAST,
 	});
-	const { data: items, error } = useSWR<(ItemType & { tags: string[] })[]>(
+	const {
+		data: items,
+		error,
+		mutate,
+	} = useSWR<(ItemType & { tags: string[] })[]>(
 		`/items?from_last=${fromLast}`,
 		apiFetcher,
 	);
+	const [auth] = useAuth();
 	const { tags, error: tagsError } = useTags();
 	const { width } = useViewportSize();
 	const ref = useRef<HTMLDivElement>(null);
@@ -74,7 +80,9 @@ export const Home = () => {
 		);
 	}
 
-	const renderedItems = items.map((item) => <Item tags={tags} item={item} key={item.id} />);
+	const renderedItems = items.map((item) => (
+		<Item tags={tags} item={item} mutate={mutate} auth={auth} key={item.id} />
+	));
 
 	if (width <= MOBILE_WIDTH) {
 		return (
@@ -100,7 +108,9 @@ export const Home = () => {
 					items={items}
 					columnGutter={16}
 					columnWidth={250}
-					render={({ data: item }) => <Item tags={tags} item={item} />}
+					render={({ data: item }) => (
+						<Item tags={tags} item={item} auth={auth} mutate={mutate} />
+					)}
 				/>
 			</Box>
 			<Affix bottom={16} right={16}>

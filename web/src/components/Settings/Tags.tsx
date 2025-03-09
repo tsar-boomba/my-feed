@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Tag as TagType } from '../../types/tag';
 import { apiUrl } from '../../api';
+import { openModal } from '@mantine/modals';
+import { EditTagModal } from './EditTagModal';
 
 export const Tags = ({ auth }: { auth: string }) => {
 	const { tags, error, mutate } = useTags();
@@ -89,7 +91,20 @@ export const Tags = ({ auth }: { auth: string }) => {
 			</Stack>
 			<Group px={8}>
 				{Array.from(tags.values()).map((tag) => (
-					<Tag tag={tag} />
+					<div style={{ cursor: 'pointer' }}>
+						<Tag
+							key={tag.name}
+							tag={tag}
+							onClick={() =>
+								openModal({
+									title: `Update ${tag.name}`,
+									children: (
+										<EditTagModal tag={tag} auth={auth} mutate={mutate} />
+									),
+								})
+							}
+						/>
+					</div>
 				))}
 			</Group>
 		</Stack>

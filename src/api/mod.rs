@@ -10,7 +10,8 @@ use axum::{
     Router,
 };
 use crud::{
-    create_item, create_source, create_tag, delete_item, delete_source, delete_tag, done, get_item, get_items, get_source, get_sources, get_tag, get_tags
+    create_item, create_source, create_tag, delete_item, delete_source, delete_tag, done, get_item,
+    get_items, get_source, get_sources, get_tag, get_tags, update_tag,
 };
 use rss::{CloneReceiver, PollMessage};
 use sqlx::{Pool, Sqlite};
@@ -40,7 +41,13 @@ pub fn api_router(config: Arc<Config>, sqlite: Pool<Sqlite>) -> color_eyre::Resu
         client,
     };
     let router = Router::new()
-        .route("/tags", get(get_tags).post(create_tag).delete(delete_tag))
+        .route(
+            "/tags",
+            get(get_tags)
+                .post(create_tag)
+                .delete(delete_tag)
+                .put(update_tag),
+        )
         .route("/tags/{name}", get(get_tag))
         .route(
             "/items",

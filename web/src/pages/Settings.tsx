@@ -4,16 +4,14 @@ import { useState } from 'react';
 import { apiUrl } from '../api';
 import { Sources } from '../components/Settings/Sources';
 import { Tags } from '../components/Settings/Tags';
+import { useAuth } from '../utils/useAuth';
 
 export const Settings = () => {
 	const [tab, setTab] = useLocalStorage({
 		key: 'settingsTab',
 		defaultValue: 'sources'
 	})
-	const [auth, setAuth] = useLocalStorage<string | undefined>({
-		key: 'auth',
-		defaultValue: undefined,
-	});
+	const [auth, setAuth] = useAuth();
 	const [inputAuth, setInputAuth] = useState('');
 	const [checkingAuth, setCheckingAuth] = useState(false);
 

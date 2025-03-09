@@ -46,6 +46,16 @@ pub async fn get_tag(
     ))
 }
 
+pub async fn update_tag(
+    State(state): State<super::State>,
+    headers: HeaderMap,
+    Json(mut tag): Json<Tag>,
+) -> Result<(), ApiError> {
+    is_authorized(&state.config, &headers).await?;
+    tag.update(&state.sqlite).await?;
+    Ok(())
+}
+
 pub async fn get_tags(State(state): State<super::State>) -> Result<Json<Vec<Tag>>, ApiError> {
     Ok(Json(Tag::get_all(&state.sqlite).await?))
 }

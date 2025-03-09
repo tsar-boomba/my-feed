@@ -1,3 +1,4 @@
+use futures::TryFutureExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::*;
@@ -63,6 +64,30 @@ impl Tag {
         .map_err(|e| Error::InsertError("tags", e))?;
 
         Ok(())
+    }
+
+    pub async fn update(
+        &mut self,
+        executor: impl Executor<'_, Database = super::DB>,
+    ) -> Result<(), Error> {
+        sqlx::query!(
+            r#"
+        UPDATE tags
+        SET
+            background_color = ?1,
+            text_color = ?2,
+            border_color = ?3
+        WHERE name = ?4
+        "#,
+            self.background_color,
+            self.text_color,
+            self.border_color,
+            self.name
+        )
+        .execute(executor)
+        .await
+        .map_err(|e| Error::UpdateError("tags", e))
+        .map(|_| ())
     }
 
     pub async fn insert_many(

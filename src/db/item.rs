@@ -72,7 +72,7 @@ impl Item {
             FROM items i
             LEFT JOIN items_to_tags it ON i.id = it.item_id
             LEFT JOIN tags t ON it.tag_id = t.name
-            WHERE i.created_at >= ? AND (? OR i.done = false)
+            WHERE i.created_at >= ?1 AND (i.done = false OR ?2)
             GROUP BY i.id
             ORDER BY i.created_at DESC;
             "#,
