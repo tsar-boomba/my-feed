@@ -30,17 +30,16 @@ export const EditTagModal = ({
 			component='form'
 			onSubmit={handleSubmit(
 				async ({ background_color, border_color, text_color }) => {
-					if (!background_color || !border_color || !text_color) return;
-					setUpdating(true);
 					const body: TagType = {
 						background_color,
 						border_color,
 						text_color,
 						name: tag.name,
-
+						
 						created_at: '',
 						updated_at: '',
 					};
+					setUpdating(true);
 
 					try {
 						const res = await fetch(apiUrl('/tags'), {
