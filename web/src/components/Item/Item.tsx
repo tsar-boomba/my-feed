@@ -1,6 +1,6 @@
 import { Item as ItemType } from '../../types/item';
 
-import { Card, Checkbox, Group, Image, Text } from '@mantine/core';
+import { Card, Checkbox, Group, Image, Text, Tooltip } from '@mantine/core';
 import * as classes from './Item.css';
 import { toLocaleDateString } from '../../utils/date';
 import { Tag as TagType } from '../../types/tag';
@@ -55,16 +55,14 @@ export const Item = ({
 
 			{item.tags && (
 				<Group gap='xs'>
-					{item.tags
-						.slice(0, 6)
-						.map((tagName) => {
-							const tag = tags.get(tagName);
-							if (tag) {
-								return <Tag key={tag.name} tag={tag} />;
-							} else {
-								return null;
-							}
-						})}
+					{item.tags.slice(0, 6).map((tagName) => {
+						const tag = tags.get(tagName);
+						if (tag) {
+							return <Tag key={tag.name} tag={tag} />;
+						} else {
+							return null;
+						}
+					})}
 				</Group>
 			)}
 
@@ -88,32 +86,34 @@ export const Item = ({
 						</Text>
 					)}
 				</div>
-				<Checkbox
-					size='md'
-					radius='xl'
-					checked={done}
-					disabled={done}
-					onChange={async () => {
-						if (done) return;
-						try {
-							const res = await fetch(apiUrl(`/items/${item.id}/done`), {
-								method: 'POST',
-								headers: {
-									['x-auth']: auth ?? '',
-								},
-							});
-							if (res.ok) {
-								setDone(true);
-								setTimeout(() => mutate?.(), 2000);
-							} else {
+				<Tooltip label='Done' position='bottom' withArrow>
+					<Checkbox
+						size='md'
+						radius='xl'
+						checked={done}
+						disabled={done}
+						onChange={async () => {
+							if (done) return;
+							try {
+								const res = await fetch(apiUrl(`/items/${item.id}/done`), {
+									method: 'POST',
+									headers: {
+										['x-auth']: auth ?? '',
+									},
+								});
+								if (res.ok) {
+									setDone(true);
+									setTimeout(() => mutate?.(), 2000);
+								} else {
+									setDone(false);
+								}
+							} catch (e) {
+								console.error(e);
 								setDone(false);
 							}
-						} catch (e) {
-							console.error(e);
-							setDone(false);
-						}
-					}}
-				/>
+						}}
+					/>
+				</Tooltip>
 
 				{/* <ActionIcon
 					variant='subtle'

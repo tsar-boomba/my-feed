@@ -42,7 +42,10 @@ COPY --from=planner /app/recipe.json recipe.json
 # Build dependencies - this is the caching Docker layer!
 RUN cargo chef cook --release --recipe-path recipe.json
 # Build application
-COPY . .
+COPY migrations migrations
+COPY src src
+COPY Cargo.toml Cargo.toml
+COPY Cargo.lock Cargo.lock
 RUN cargo build --release
 
 FROM --platform=$BUILDPLATFORM debian:bullseye-slim AS runtime
