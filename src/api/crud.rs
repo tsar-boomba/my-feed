@@ -6,6 +6,7 @@ use axum::{
 };
 use chrono::Utc;
 use http::HeaderMap;
+use rustc_hash::FxHashSet;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -102,8 +103,8 @@ pub struct GetItemsQuery {
 #[derive(Debug, Serialize)]
 pub struct GetItemsReturn {
     #[serde(flatten)]
-    item: Item,
-    tags: Vec<String>,
+    pub item: Item,
+    pub tags: FxHashSet<String>,
 }
 
 pub async fn get_items(
@@ -121,6 +122,7 @@ pub async fn get_items(
                     .tags
                     .unwrap_or_default()
                     .split(",")
+                    .filter(|s| !s.is_empty())
                     .map(ToString::to_string)
                     .collect(),
             })

@@ -4,7 +4,7 @@ export const apiUrl = (path: string) => `${BASE_URL}/api${path}`;
 export const staticUrl = (path: string) => `${BASE_URL}${path}`;
 
 export const fetcher = <JSON = unknown>(url: string): Promise<JSON> =>
-	fetch(url, { credentials: 'include' }).then((res) => {
+	fetch(url).then((res) => {
 		if (res.ok) {
 			return res.json();
 		} else {

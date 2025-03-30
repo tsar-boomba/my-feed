@@ -1,6 +1,7 @@
 mod auth;
 mod crud;
 mod rss;
+mod preview;
 
 use std::{sync::Arc, time::Duration};
 
@@ -60,6 +61,7 @@ pub fn api_router(config: Arc<Config>, sqlite: Pool<Sqlite>) -> color_eyre::Resu
             get(get_sources).post(create_source).delete(delete_source),
         )
         .route("/sources/{id}", get(get_source))
+        .route("/sources/preview", post(preview::preview_source))
         .route("/login", post(login))
         .with_state(state);
 

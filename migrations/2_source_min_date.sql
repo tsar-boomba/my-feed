@@ -1,0 +1,2 @@
+ALTER TABLE sources
+ADD COLUMN min_date DATETIME;

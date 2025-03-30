@@ -24,6 +24,7 @@ export const Item = ({
 }) => {
 	const imageUrl = item.image ? URL.parse(item.image) : null;
 	const [done, setDone] = useState(item.done);
+	const hasTags = item.tags.length > 0;
 
 	if (done) {
 		return (
@@ -53,7 +54,7 @@ export const Item = ({
 					</a>
 				)}
 
-			{item.tags && (
+			{hasTags && (
 				<Group gap='xs'>
 					{item.tags.slice(0, 6).map((tagName) => {
 						const tag = tags.get(tagName);
@@ -72,7 +73,7 @@ export const Item = ({
 				target='_blank'
 				fw={700}
 				className={classes.title}
-				mt='xs'
+				mt={hasTags ? 'xs' : undefined}
 			>
 				{item.title || item.link.slice(0, 40)}
 			</Text>

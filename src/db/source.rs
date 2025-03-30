@@ -6,6 +6,7 @@ use super::{Error, Tag};
 
 #[derive(Debug, FromRow, Serialize, Deserialize, ts_rs::TS)]
 #[ts(export, export_to = "../web/src/types/Source.ts")]
+#[serde(rename_all = "camelCase")]
 pub struct Source {
     #[ts(type = "number")]
     pub id: i64,
@@ -24,6 +25,9 @@ pub struct Source {
 
     #[serde(default)]
     pub favorite: bool,
+
+    #[serde(default)]
+    pub min_date: Option<chrono::NaiveDateTime>,
 
     #[serde(skip_deserializing)]
     pub created_at: chrono::NaiveDateTime,
@@ -97,15 +101,16 @@ impl Source {
     ) -> Result<(), Error> {
         let id = sqlx::query!(
             r#"
-		INSERT INTO sources(name, url, last_pub, last_poll, ttl, favorite)
-		VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+		INSERT INTO sources(name, url, last_pub, last_poll, ttl, favorite, min_date)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		"#,
             self.name,
             self.url,
             self.last_pub,
             self.last_poll,
             self.ttl,
-            self.favorite
+            self.favorite,
+            self.min_date
         )
         .execute(executor)
         .await
@@ -124,13 +129,14 @@ impl Source {
             r#"
 		UPDATE sources
         SET
-            name = ?1,
-            url = ?2,
-            last_pub = ?3,
-            last_poll = ?4,
-            ttl = ?5,
-            favorite = ?6
-		WHERE id = ?7
+            name = $1,
+            url = $2,
+            last_pub = $3,
+            last_poll = $4,
+            ttl = $5,
+            favorite = $6,
+            min_date = $7
+		WHERE id = $8
 		"#,
             self.name,
             self.url,
@@ -138,6 +144,7 @@ impl Source {
             self.last_poll,
             self.ttl,
             self.favorite,
+            self.min_date,
             self.id
         )
         .fetch_optional(executor)

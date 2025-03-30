@@ -85,6 +85,18 @@ pub fn start_poller(
                             let pub_date = channel_item
                                 .pub_date
                                 .and_then(|s| DateTime::parse_from_rfc2822(&s).ok());
+                            if let Some(min_date) = source.min_date {
+                                if let Some(pub_date) = pub_date {
+                                    if pub_date
+                                        < min_date.and_local_timezone(pub_date.timezone()).unwrap()
+                                    {
+                                        // If item is older than the min_date for this source, ignore it
+                                        tracing::debug!("Ignoring {link} because its too old.");
+                                        return Ok(());
+                                    }
+                                }
+                            }
+
                             let image = get_image_from_link(&client, &link).await?;
 
                             let item = Item {
@@ -107,6 +119,7 @@ pub fn start_poller(
                             let item_categories = channel_item
                                 .categories
                                 .into_iter()
+                                .filter(|c| !c.name.is_empty())
                                 .map(|c| Arc::<str>::from(c.name.to_ascii_lowercase().as_str()))
                                 .collect::<FxHashSet<_>>();
 
@@ -221,7 +234,7 @@ pub async fn get_channel_for_source(
     Ok(rss::Channel::read_from(&*res.bytes().await?)?)
 }
 
-async fn get_image_from_link(
+pub async fn get_image_from_link(
     client: &reqwest::Client,
     link: &str,
 ) -> Result<Option<String>, Box<dyn Error + 'static>> {
