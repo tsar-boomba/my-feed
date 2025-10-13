@@ -7,11 +7,15 @@ import viteCompression from 'vite-plugin-compression';
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [
-		react(),
+		react({
+			babel: {
+				plugins: ['babel-plugin-react-compiler'],
+			},
+		}),
 		vanillaExtractPlugin(),
 		// basicSsl({
 		// 	name: 'my-feed',
 		// }),
-		viteCompression()
+		viteCompression(),
 	],
 });
