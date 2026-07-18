@@ -13,9 +13,9 @@ use tower_http::{cors::CorsLayer, normalize_path::NormalizePathLayer, trace::Tra
 
 mod api;
 mod config;
+mod db;
 mod error;
 mod static_files;
-mod db;
 
 fn main() -> color_eyre::Result<()> {
     let config = Config::from_env()?;
@@ -53,7 +53,11 @@ async fn server(config: Config) -> color_eyre::Result<()> {
 
     let sqlite_options = SqliteConnectOptions::new()
         .filename(config.data_dir.join("db"))
-        .create_if_missing(true);
+        .create_if_missing(true)
+        .pragma("foreign_keys", "on")
+        .pragma("busy_timeout", "5000")
+        .pragma("journal_mode", "WAL")
+        .pragma("synchronous", "NORMAL");
     let sqlite = sqlx::SqlitePool::connect_with(sqlite_options).await?;
     sqlx::migrate!().run(&sqlite).await?;
 
