@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-freya = { version = "0.4.0", features = ["router", "query"] }
+freya = { git = "https://github.com/marc2332/freya", branch = "main", features = ["router", "query"] }
 ureq = { version = "3.3.0", features = ["json"] }
 tokio = { workspace = true, features = ["sync", "fs"] }
 serde = { workspace = true, features = ["derive"] }

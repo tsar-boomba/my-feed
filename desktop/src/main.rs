@@ -23,7 +23,13 @@ fn main() {
 }
 
 fn app() -> impl IntoElement {
-    Router::<Route>::new(|| RouterConfig::default().with_initial_path(Route::Home))
+    let mut theme = use_init_theme(|| Platform::get().preferred_theme.read().to_theme());
+
+    use_side_effect(move || theme.set(Platform::get().preferred_theme.read().to_theme()));
+
+    rect().theme_background().child(Router::<Route>::new(|| {
+        RouterConfig::default().with_initial_path(Route::Home)
+    }))
 }
 
 #[derive(PartialEq)]
@@ -60,7 +66,9 @@ impl Component for Home {
                 .into_element(),
         };
 
-        ScrollView::new().direction(Direction::Vertical).child(content)
+        ScrollView::new()
+            .direction(Direction::Vertical)
+            .child(content)
     }
 }
 
@@ -71,13 +79,26 @@ struct Card {
 
 impl Component for Card {
     fn render(&self) -> impl IntoElement {
-        Link::new(&*self.item.item.link).child(
-            self.item
-                .item
-                .title
-                .as_deref()
-                .unwrap_or(&self.item.item.link),
-        )
+        rect()
+            .direction(Direction::Vertical)
+            .padding(4.)
+            .corner_radius(4.)
+            .border(Border::new().width(1.).fill((127, 127, 127)))
+            .child(
+                Link::new(&*self.item.item.link).child(
+                    label()
+                        .theme_color()
+                        .font_weight(FontWeight::BOLD)
+                        .font_size(24.)
+                        .text(
+                            self.item
+                                .item
+                                .title
+                                .clone()
+                                .unwrap_or(self.item.item.link.clone()),
+                        ),
+                ),
+            )
     }
 
     fn render_key(&self) -> DiffKey {
