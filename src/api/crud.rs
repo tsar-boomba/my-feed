@@ -111,7 +111,6 @@ pub async fn get_items(
     State(state): State<super::State>,
     Query(query): Query<GetItemsQuery>,
 ) -> Result<Json<Vec<GetItemsReturn>>, ApiError> {
-    tracing::debug!("{:?}", query.from_last);
     Ok(Json(
         Item::feed(query.from_last, query.include_done, &state.sqlite)
             .await?
