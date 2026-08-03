@@ -25,7 +25,7 @@ RUN apt-get update
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 
 ENV PATH="/root/.cargo/bin:${PATH}"
-RUN cargo install --locked --version 0.1.67 cargo-chef
+RUN cargo install --locked --version 0.1.77 cargo-chef
 RUN cargo install --locked --version 0.8.3 sqlx-cli --no-default-features --features rustls,sqlite
 ENV DATABASE_URL=sqlite:///my-feed-data/db
 RUN mkdir -p /my-feed-data
@@ -48,7 +48,7 @@ COPY Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
 RUN cargo build --release
 
-FROM --platform=$BUILDPLATFORM debian:bullseye-slim AS runtime
+FROM --platform=$BUILDPLATFORM gcr.io/distroless/cc-debian12 AS runtime
 WORKDIR /app
 COPY --from=web-build /web/dist /my-feed-web
 COPY --from=builder /app/target/release/my-feed /my-feed

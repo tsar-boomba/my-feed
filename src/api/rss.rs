@@ -7,7 +7,7 @@ use std::{
 
 use chrono::DateTime;
 use futures::{stream::FuturesUnordered, StreamExt};
-use http::Uri;
+use http::{header::CONTENT_TYPE, Uri};
 use rustc_hash::FxHashSet;
 use sqlx::{Pool, Sqlite};
 use tokio::{
@@ -242,6 +242,21 @@ pub async fn get_image_from_link(
         LazyLock::new(|| scraper::Selector::parse("head > meta[property=\"og:image\"]").unwrap());
 
     let res = client.get(link).send().await?;
+
+    if res.content_length().is_some_and(|len| len > 512 * 1024) {
+        tracing::warn!("HTML for {link} over 512KiB, not parsing");
+        return Ok(None);
+    }
+
+    if !res
+        .headers()
+        .get(CONTENT_TYPE)
+        .is_some_and(|typ| typ == "text/html")
+    {
+        // Not html
+        return Ok(None);
+    }
+
     let page = scraper::Html::parse_document(&res.text().await?);
     if !page.errors.is_empty() {
         tracing::error!("Html parse errors for {link}: {:?}", page.errors);
